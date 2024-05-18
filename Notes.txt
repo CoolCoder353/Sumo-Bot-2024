@@ -1,0 +1,21 @@
+Josh's bot
+
+
+Motors through MA and MB: Left and Right
+
+Power through Center M
+
++ve motors M1
+-ve motors M2
+
+
+IR:
+d3, - side
+d10, - side
+A0, - front
+A2, - front
+A1, - front
+
+Color:
+d11,
+d12,
