@@ -1,0 +1,8 @@
+IR1:
+    D10:
+    blue = ground
+    brown = 5v
+    black = sig
+
+Ultrasonic:
+    
