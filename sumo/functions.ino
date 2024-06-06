@@ -56,3 +56,9 @@ void ScanForEnemies()
     }
   }
 }
+
+void LookForLine(int &var) // &var is pointer to variable
+{
+  // Check both IR Line Sensors for Line
+  var = (isSomethingInFront(IR_LINE_L) ? 1 : (isSomethingInFront(IR_LINE_R) ? 2 : 0));
+}

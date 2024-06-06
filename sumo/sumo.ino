@@ -4,16 +4,12 @@
 #define ULTRASONIC_TRIG 9
 #define ULTRASONIC_TIMEOUT 300
 
-#define IR_L 3  // IR Sensor, facing left
-#define IR_C -1 // ID Sensor, facing center
-#define IR_R 10 // IR Sensor, facing right
+#define IR_L 10 // IR (Bot) Sensor,   facing left
+#define IR_R 12 // IR (Bot) Sensor,  facing right
+#define IR_C 11 // IR (Bot) Sensor, facing center
 
-#define COCAINE_LINE1
-
-// NOTE: Cant be define as needs to be changed
-int State = 0 // 0=IDLE, 1=ATTACK, 2=DEFEND
-
-#define Is_Near_White_Line 0 // 0=No, 1=Left, 2=Right
+#define IR_LINE_L 2 // IR (Line) Sensor,  Left Side
+#define IR_LINE_R 3 // IR (Line) Sensor, Right Side
 
 #define Pivot_Spin 1    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
 #define Pivot_Speed 255 // Speed of Pivot Spin, not dependant on Pivot_Spin
@@ -26,32 +22,42 @@ int State = 0 // 0=IDLE, 1=ATTACK, 2=DEFEND
 
 #define Defend_Speed 255                // Speed of Defend
 #define Defend_Distance 70              // Distance to Defend
-#define Defend_Velcoty_Check_Time = 300 // Time to check the velocity of the enemy (ms)
-#define Defend_Velocity_Threshold = 10  // Threshold for the velocity of the enemy
+#define Defend_Velocity_Check_Time 300 // Time to check the velocity of the enemy (ms)
+#define Defend_Velocity_Threshold 10  // Threshold for the velocity of the enemy
 
-    // Configure the motor driver.
-    CytronMD MOTOR_L(PWM_DIR, 5, 4);
+// NOTE: Cant be define as needs to be changed
+int State = 0; // 0=IDLE, 1=ATTACK, 2=DEFEND
+
+int Is_Near_White_Line = 0; // 0=No, 1=Left, 2=Right
+
+// Configure the motor driver.
+CytronMD MOTOR_L(PWM_DIR, 5, 4);
 CytronMD MOTOR_R(PWM_DIR, 6, 7);
 
 void setup()
 {
-  // put your setup code here, to run once:
+  // 9600 baud serial monitor
   Serial.begin(9600);
 
-  pinMode(IR_L, INPUT); // D Pin 3
-  pinMode(IR_C, INPUT); // D Pin 9
-  pinMode(IR_R, INPUT); // D Pin 10
+  // Bot IR Pins
+  pinMode(IR_L, INPUT); // D Pin 10
+  pinMode(IR_C, INPUT); // D Pin 11
+  pinMode(IR_R, INPUT); // D Pin 12
 
-  pinMode(ULTRASONIC_TRIG, OUTPUT);
-  pinMode(ULTRASONIC_ECHO, INPUT);
+  // Line IR Pins
+  pinMode(IR_LINE_L, INPUT);
+  pinMode(IR_LINE_R, INPUT);
 
-  // findOpps();
+  // Ultrasonic IR Pins
+  pinMode(ULTRASONIC_TRIG, OUTPUT); // HC SR04  (Trigger)
+  pinMode(ULTRASONIC_ECHO, INPUT);  // HC SR04 (Response)
 }
 
 void loop()
 {
-
   // Check if we are near white line or not
+  LookForLine(Is_Near_White_Line);
+  Serial.println(Is_Near_White_Line);
 
   if (State == 0)
   {
@@ -138,7 +144,7 @@ void Defend()
   if (isSomethingInFront(IR_C))
   {
     // Check the enemies speed
-    float velocity = GetVelocity(Defend_Velcoty_Check_Time);
+    float velocity = GetVelocity(Defend_Velocity_Check_Time);
     if (velocity >= Defend_Velocity_Threshold)
     {
       // Avoid the enemy somehow?
