@@ -39,3 +39,20 @@ bool isSomethingInFront(uint8_t port) // IR Sensor
 {
   return !digitalRead(port);
 }
+
+void ScanForEnemies()
+{
+  // Scan for enemies, not dependant on Scan_While_Travel
+  if (isSomethingInFront(IR_C) || isSomethingInFront(IR_L) || isSomethingInFront(IR_R))
+  {
+    float distance = GetDistance();
+    if (distance <= Attack_Distance)
+    {
+      State = 1;
+    }
+    else if (distance <= Defend_Distance)
+    {
+      State = 2;
+    }
+  }
+}

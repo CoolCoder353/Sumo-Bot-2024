@@ -1,0 +1,17 @@
+3 states: IDLE, ATTACK, DEFEND
+
+IDLE -> STARTING STATE
+    -> Scans for opponents and randomly moves across the map
+    -> If an opponent is within x cm from the bot, go to ATTACK
+    -> If an opponent is within y cm from the bot,
+        ->If it is moving towards us, go to DEFEND
+        ->Else, go to ATTACK
+
+ATTACK
+    -> Rams at the opponent
+    -> If cant find opponent, go to IDLE
+
+DEFEND
+    -> Trys to avoid opponent
+    -> If successful, go to ATTACK
+    -> If cant find opponent, go to IDLE
