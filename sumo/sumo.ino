@@ -4,29 +4,29 @@
 #define ULTRASONIC_TRIG 9
 #define ULTRASONIC_TIMEOUT 300
 
-#define IR_L 10 // IR (Bot) Sensor,   facing left
-#define IR_R 12 // IR (Bot) Sensor,  facing right
-#define IR_C 11 // IR (Bot) Sensor, facing center
+#define IR_L 10                         // IR (Bot) Sensor,   facing left
+#define IR_R 12                         // IR (Bot) Sensor,  facing right
+#define IR_C 11                         // IR (Bot) Sensor, facing center
 
-#define IR_LINE_L 2 // IR (Line) Sensor,  Left Side
-#define IR_LINE_R 3 // IR (Line) Sensor, Right Side
+#define IR_LINE_L 2                     // IR (Line) Sensor,  Left Side
+#define IR_LINE_R 3                     // IR (Line) Sensor, Right Side
 
-#define Pivot_Spin 1    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
-#define Pivot_Speed 255 // Speed of Pivot Spin, not dependant on Pivot_Spin
+#define Pivot_Spin 1                    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
+#define Pivot_Speed 255                 // Speed of Pivot Spin, not dependant on Pivot_Spin
 
-#define Travel_Speed 255    // Speed of Travel
-#define Scan_While_Travel 1 // If we should scan for enemies while moving 0=No, 1=Yes
+#define Travel_Speed 255                // Speed of Travel
+#define Scan_While_Travel 1             // If we should scan for enemies while moving 0=No, 1=Yes
 
-#define Attack_Speed 255   // Speed of Attack
-#define Attack_Distance 25 // Distance to Attack
+#define Attack_Speed 255                // Speed of Attack
+#define Attack_Distance 25              // Distance to Attack (cm)
 
 #define Defend_Speed 255                // Speed of Defend
-#define Defend_Distance 70              // Distance to Defend
-#define Defend_Velocity_Check_Time 300 // Time to check the velocity of the enemy (ms)
-#define Defend_Velocity_Threshold 10  // Threshold for the velocity of the enemy
+#define Defend_Distance 70              // Distance to Defend (cm)
+#define Defend_Velocity_Check_Time 300  // Time to check the velocity of the enemy (ms)
+#define Defend_Velocity_Threshold 10    // Threshold for the velocity of the enemy (cm/s)
 
 // NOTE: Cant be define as needs to be changed
-int State = 0; // 0=IDLE, 1=ATTACK, 2=DEFEND
+int State = -1; // -1=WAIT/DELAY, 0=IDLE, 1=ATTACK, 2=DEFEND
 
 int Is_Near_White_Line = 0; // 0=No, 1=Left, 2=Right
 
@@ -51,6 +51,9 @@ void setup()
   // Ultrasonic IR Pins
   pinMode(ULTRASONIC_TRIG, OUTPUT); // HC SR04  (Trigger)
   pinMode(ULTRASONIC_ECHO, INPUT);  // HC SR04 (Response)
+
+  delay(3000); // Wait 3 Seconds
+  State = 0;
 }
 
 void loop()
@@ -140,14 +143,27 @@ void Attack()
 
 void Defend()
 {
-  // Check if the enemy is in front of us
-  if (isSomethingInFront(IR_C))
+  // Check if the enemy is in front of us and not on white line
+  if (isSomethingInFront(IR_C) && Is_Near_White_Line == 0)
   {
     // Check the enemies speed
     float velocity = GetVelocity(Defend_Velocity_Check_Time);
     if (velocity >= Defend_Velocity_Threshold)
     {
-      // Avoid the enemy somehow?
+      // Avoid the enemy on right
+      while (isSomethingInFront(IR_C) || isSomethingInFront(IR_L) || isSomethingInFront(IR_R))
+      {
+        if (Is_Near_White_Line == 1) // White on Left => Turn Right => More Speed Left
+        {
+          MOTOR_L.setSpeed(Defend_Speed);
+          MOTOR_R.setSpeed(Pivot_Spin ? -Defend_Speed : 0);
+        } else { // White on Right or No White => Turn Left => More Speed Right;
+          MOTOR_R.setSpeed(Defend_Speed);
+          MOTOR_L.setSpeed(Pivot_Spin ? -Defend_Speed : 0);
+        }
+        LookForLine(Is_Near_White_Line);
+      }
+      state = 0;
     }
     else
     {
