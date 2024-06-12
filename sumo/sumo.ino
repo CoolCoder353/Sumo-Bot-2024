@@ -163,7 +163,7 @@ void Defend()
         }
         LookForLine(Is_Near_White_Line);
       }
-      state = 0;
+      State = 0;
     }
     else
     {

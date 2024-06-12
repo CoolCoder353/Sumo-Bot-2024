@@ -32,7 +32,7 @@ float GetVelocity(int time_ms) // Get Average Speed (over 60ms increments/interv
   }
   float ellapsed = millis() - start;
   float velocity = (finald - firstd) / ellapsed; // cm/ms
-  velocity *= 1000 // cm/s
+  velocity *= 1000; // cm/s
   return velocity;
 }
 
