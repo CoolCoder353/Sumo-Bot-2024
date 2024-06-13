@@ -26,9 +26,8 @@
 #define Defend_Velocity_Threshold 10    // Threshold for the velocity of the enemy (cm/s)
 
 // NOTE: Cant be define as needs to be changed
-int State = -1; // -1=WAIT/DELAY, 0=IDLE, 1=ATTACK, 2=DEFEND
-
-int Is_Near_White_Line = 0; // 0=No, 1=Left, 2=Right
+int State = -1;                         // -1=WAIT/DELAY, 0=IDLE, 1=ATTACK, 2=DEFEND
+int Is_Near_White_Line = 0;             // 0=No, 1=Left, 2=Right
 
 // Configure the motor driver.
 CytronMD MOTOR_L(PWM_DIR, 5, 4);
