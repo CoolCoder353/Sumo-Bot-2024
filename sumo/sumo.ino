@@ -7,7 +7,7 @@
 #define ULTRASONIC_TIMEOUT 300
 
 #define IR_L A0                         // IR (Bot) Sensor,   facing left (Analog/Digital)
-#define IR_R A2                         // IR (Bot) Sensor,  facing right (Analog/Digital)
+#define IR_R A5                         // IR (Bot) Sensor,  facing right (Analog/Digital)
 #define IR_C A1                         // IR (Bot) Sensor, facing center (Analog/Digital)
 
 #define IR_LINE_L 2                     // IR (Line [color]) Sensor,  Left Side
@@ -61,7 +61,6 @@ void loop()
 {
   // Check if we are near white line or not
   LookForLine(Is_Near_White_Line);
-  Serial.println(Is_Near_White_Line);
 
   // Start Code
   if (digitalRead(BUTTON_OUTPUT) && State == -1)
