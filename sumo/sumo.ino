@@ -54,7 +54,7 @@ void setup()
   pinMode(ULTRASONIC_ECHO, INPUT);  // HC SR04 (Response)
 
   // Button Pin
-  pinMode(FUCKING_GO_YOU_STUPID_ROBOT, INPUT);
+  pinMode(BUTTON_OUTPUT, INPUT);
 }
 
 void loop()
