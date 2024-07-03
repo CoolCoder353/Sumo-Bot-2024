@@ -1,5 +1,7 @@
 #include <CytronMotorDriver.h>
 
+#define BUTTON_OUTPUT 13                // Button to make shit happen
+
 #define ULTRASONIC_ECHO 8
 #define ULTRASONIC_TRIG 9
 #define ULTRASONIC_TIMEOUT 300
@@ -8,8 +10,8 @@
 #define IR_R 12                         // IR (Bot) Sensor,  facing right
 #define IR_C 11                         // IR (Bot) Sensor, facing center
 
-#define IR_LINE_L 2                     // IR (Line) Sensor,  Left Side
-#define IR_LINE_R 3                     // IR (Line) Sensor, Right Side
+#define IR_LINE_L 2                     // IR (Line [color]) Sensor,  Left Side
+#define IR_LINE_R 3                     // IR (Line [color]) Sensor, Right Side
 
 #define Pivot_Spin 1                    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
 #define Pivot_Speed 255                 // Speed of Pivot Spin, not dependant on Pivot_Spin
@@ -51,8 +53,8 @@ void setup()
   pinMode(ULTRASONIC_TRIG, OUTPUT); // HC SR04  (Trigger)
   pinMode(ULTRASONIC_ECHO, INPUT);  // HC SR04 (Response)
 
-  delay(3000); // Wait 3 Seconds
-  State = 0;
+  // Button Pin
+  pinMode(FUCKING_GO_YOU_STUPID_ROBOT, INPUT);
 }
 
 void loop()
@@ -61,6 +63,18 @@ void loop()
   LookForLine(Is_Near_White_Line);
   Serial.println(Is_Near_White_Line);
 
+  // Start Code
+  if (digitalRead(BUTTON_OUTPUT) && State == -1)
+  {
+    delay(3000); // Wait 3 seconds
+    State = 0;
+  }
+  // Stop code
+  if (!digitalRead(BUTTON_OUTPUT))
+  {
+    State = -1;
+  }
+  // Functions based on state
   if (State == 0)
   {
     Idle();
