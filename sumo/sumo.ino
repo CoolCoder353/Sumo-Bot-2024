@@ -2,13 +2,13 @@
 
 #define BUTTON_OUTPUT 13                // Button to make shit happen
 
-#define ULTRASONIC_ECHO 8
-#define ULTRASONIC_TRIG 9
+#define ULTRASONIC_ECHO 10
+#define ULTRASONIC_TRIG 11
 #define ULTRASONIC_TIMEOUT 300
 
-#define IR_L 10                         // IR (Bot) Sensor,   facing left
-#define IR_R 12                         // IR (Bot) Sensor,  facing right
-#define IR_C 11                         // IR (Bot) Sensor, facing center
+#define IR_L A0                         // IR (Bot) Sensor,   facing left (Analog/Digital)
+#define IR_R A2                         // IR (Bot) Sensor,  facing right (Analog/Digital)
+#define IR_C A1                         // IR (Bot) Sensor, facing center (Analog/Digital)
 
 #define IR_LINE_L 2                     // IR (Line [color]) Sensor,  Left Side
 #define IR_LINE_R 3                     // IR (Line [color]) Sensor, Right Side
