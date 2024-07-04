@@ -9,12 +9,15 @@
 #define IR_L A5                         // IR (Bot) Sensor,   facing left (Analog/Digital)
 #define IR_R A0                         // IR (Bot) Sensor,  facing right (Analog/Digital)
 #define IR_C A1                         // IR (Bot) Sensor, facing center (Analog/Digital)
+#define IR_FRAME_STEP 10                // Amount of "frames" before reading IR Sensors
+#define IR_TURN_DELAY 100               // Time (ms) to turn if IR sees bot
 
 #define IR_LINE_L 2                     // IR (Line [color]) Sensor,  Left Side
 #define IR_LINE_R 3                     // IR (Line [color]) Sensor, Right Side
+#define IR_LINE_DELAY 750               // Time (ms) of backwards, and turn/spin
 
 #define Pivot_Spin 0                    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
-#define Pivot_Speed 150                // Speed of Pivot Spin, not dependant on Pivot_Spin
+#define Pivot_Speed 150                 // Speed of Pivot Spin, not dependant on Pivot_Spin
 
 #define Travel_Speed 100                // Speed of Travel
 #define Scan_While_Travel 1             // If we should scan for enemies while moving 0=No, 1=Yes
@@ -65,13 +68,16 @@ void setup()
 
 void loop()
 {
-  // Start Code
+  //////////////
+  // BUTTON CODE
+  //////////////
+  // Start
   if (digitalRead(BUTTON_OUTPUT) && State == -1)
   {
     delay(3000); // Wait 3 seconds
     State = 0;
   }
-  // Stop code
+  // Stop
   if (!digitalRead(BUTTON_OUTPUT))
   {
     MOTOR_L.setSpeed(0);
@@ -79,43 +85,31 @@ void loop()
     State = -1;
     return;
   }
+
+  //////////////////
+  // COLOR/LINE CODE
+  //////////////////
   // Check if we are near white line or not
   LookForLine(Is_Near_White_Line);
   if (Is_Near_White_Line > 0)
   {
-    if (Is_Near_White_Line == 1)
-    {
-      Serial.println("White on left, turning right");
-      // Go Backward
-      MOTOR_L.setSpeed(Pivot_Speed);
-      MOTOR_R.setSpeed(-Pivot_Speed);
-      delay(750);
-      // Turn Right
-      MOTOR_L.setSpeed(-Pivot_Speed);
-      MOTOR_R.setSpeed(Pivot_Spin ? -Pivot_Speed : 0);
-      delay(750);
-    }
-    else if (Is_Near_White_Line == 2)
-    {
-      Serial.println("White on right, turning left");
-      // Go Backward
-      MOTOR_L.setSpeed(Pivot_Speed);
-      MOTOR_R.setSpeed(-Pivot_Speed);
-      delay(750);
-      // Turn Left
-      MOTOR_L.setSpeed(-Pivot_Spin ? Pivot_Speed : 0);
-      MOTOR_R.setSpeed(Pivot_Speed);
-      delay(750);
-    }
-    return;
+    AvoidWhiteLine();
+    return; // Immediately skip to next update to avoid double turns
   }
+
+  /////////////////
+  // IR SENSOR CODE
+  /////////////////
   // Update IR vars if 10 frames
-  if (ircount % 10 == 0)
+  if (ircount % IR_FRAME_STEP == 0)
   {
     isirc = isSomethingInFront(IR_C);
     isirl = isSomethingInFront(IR_L);
     isirr = isSomethingInFront(IR_R);
   }
+  ircount++;
+
+  // LOGGING
   // Serial.println("COLOR SENSORS: ");
   // Serial.println(!digitalRead(IR_LINE_L));
   // Serial.println(!digitalRead(IR_LINE_R));
@@ -127,6 +121,10 @@ void loop()
   // Serial.println("ULTRASONIC SENSORS");
   // Serial.println(GetDistance());
   // delay(3000);
+
+  ////////////////
+  // STATE MACHINE
+  ////////////////
   // Functions based on state
   if (State == 0)
   {
@@ -147,31 +145,7 @@ void Idle()
   Serial.println("IDLING");
   if (Is_Near_White_Line > 0)
   {
-    // Turn in the direction away from the line, dependant on which sensor sees white line
-    if (Is_Near_White_Line == 1)
-    {
-      Serial.println("White on left, turning right");
-      // Go Backward
-      MOTOR_L.setSpeed(Pivot_Speed);
-      MOTOR_R.setSpeed(-Pivot_Speed);
-      delay(750);
-      // Turn Right
-      MOTOR_L.setSpeed(-Pivot_Speed);
-      MOTOR_R.setSpeed(Pivot_Spin ? -Pivot_Speed : 0);
-      delay(750);
-    }
-    else if (Is_Near_White_Line == 2)
-    {
-      Serial.println("White on right, turning left");
-      // Go Backward
-      MOTOR_L.setSpeed(Pivot_Speed);
-      MOTOR_R.setSpeed(-Pivot_Speed);
-      delay(750);
-      // Turn Left
-      MOTOR_L.setSpeed(-Pivot_Spin ? Pivot_Speed : 0);
-      MOTOR_R.setSpeed(Pivot_Speed);
-      delay(750);
-    }
+    AvoidWhiteLine();
     ScanForEnemies();
   }
   else
@@ -195,7 +169,7 @@ void Attack()
     State = 0;
   }
   // Check if the enemy is in front of us
-  if (isSomethingInFront(IR_C))
+  if (isirc)
   {
     Serial.println("Enemy In Front");
     // Move Forward
@@ -204,21 +178,21 @@ void Attack()
   }
 
   // Turn in the direction of the enemy
-  else if (isSomethingInFront(IR_R))
+  else if (isirr)
   {
     Serial.println("Enemy to right");
     // Turn Right
     MOTOR_L.setSpeed(-Attack_Speed);
     MOTOR_R.setSpeed(Pivot_Spin ? -Attack_Speed : 0);
-    delay(100);
+    delay(IR_TURN_DELAY);
   }
-  else if (isSomethingInFront(IR_L))
+  else if (isirl)
   {
     Serial.println("Enemy to left");
     // Turn Left
     MOTOR_L.setSpeed(Pivot_Spin ? Attack_Speed : 0);
     MOTOR_R.setSpeed(Attack_Speed);
-    delay(100);
+    delay(IR_TURN_DELAY);
   }
   else
   {

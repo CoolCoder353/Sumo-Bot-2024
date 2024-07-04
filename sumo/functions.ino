@@ -64,3 +64,31 @@ void LookForLine(int &var) // &var is pointer to variable
   // Check both IR Line Sensors for Line
   var = (isSomethingInFront(IR_LINE_L) ? 1 : (isSomethingInFront(IR_LINE_R) ? 2 : 0));
 }
+
+void AvoidWhiteLine()
+{
+  if (Is_Near_White_Line == 1)
+    {
+      Serial.println("White on left, turning right");
+      // Go Backward
+      MOTOR_L.setSpeed(Pivot_Speed);
+      MOTOR_R.setSpeed(-Pivot_Speed);
+      delay(IR_LINE_DELAY);
+      // Turn Right
+      MOTOR_L.setSpeed(-Pivot_Speed);
+      MOTOR_R.setSpeed(Pivot_Spin ? -Pivot_Speed : 0);
+      delay(IR_LINE_DELAY);
+    }
+    else if (Is_Near_White_Line == 2)
+    {
+      Serial.println("White on right, turning left");
+      // Go Backward
+      MOTOR_L.setSpeed(Pivot_Speed);
+      MOTOR_R.setSpeed(-Pivot_Speed);
+      delay(IR_LINE_DELAY);
+      // Turn Left
+      MOTOR_L.setSpeed(-Pivot_Spin ? Pivot_Speed : 0);
+      MOTOR_R.setSpeed(Pivot_Speed);
+      delay(IR_LINE_DELAY);
+    }
+}
