@@ -43,6 +43,7 @@ bool isSomethingInFront(uint8_t port) // IR Sensor
 
 void ScanForEnemies()
 {
+  Serial.println("Scanning for enemies");
   // Scan for enemies, not dependant on Scan_While_Travel
   if (isSomethingInFront(IR_C) || isSomethingInFront(IR_L) || isSomethingInFront(IR_R))
   {
