@@ -87,8 +87,26 @@ void AvoidWhiteLine()
       MOTOR_R.setSpeed(-Pivot_Speed);
       delay(IR_LINE_DELAY);
       // Turn Left
-      MOTOR_L.setSpeed(-Pivot_Spin ? Pivot_Speed : 0);
+      MOTOR_L.setSpeed(Pivot_Spin ? -Pivot_Speed : 0);
       MOTOR_R.setSpeed(Pivot_Speed);
       delay(IR_LINE_DELAY);
     }
+}
+
+void SetSpeed(bool chnl_a, int speed)
+{
+  if (chnl_a)
+  {
+    // Apply to motor channel A
+    digitalWrite(CHNL_A_BRK, (speed == 0) ? HIGH : LOW);
+    digitalWrite(CHNL_A_DIR, (speed < 0) ? LOW : HIGH);
+    analogWrite(CHNL_A_PWM, (speed < 0) ? -speed, speed);
+  }
+  else
+  {
+    // Apply to motor channel B
+    digitalWrite(CHNL_B_BRK, (speed == 0) ? HIGH : LOW);
+    digitalWrite(CHNL_B_DIR, (speed < 0) ? LOW : HIGH);
+    analogWrite(CHNL_B_PWM, (speed < 0) ? -speed, speed);
+  }
 }

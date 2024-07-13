@@ -1,20 +1,32 @@
-#include <CytronMotorDriver.h>
+// #include <CytronMotorDriver.h>
 
-#define BUTTON_OUTPUT 12                // Button to make shit happen
+#define BUTTON_OUTPUT 36                // Button to make shit happen
 
-#define ULTRASONIC_ECHO 10
-#define ULTRASONIC_TRIG 11
+#define ULTRASONIC_ECHO 30
+#define ULTRASONIC_TRIG 28
 #define ULTRASONIC_TIMEOUT 300
 
-#define IR_L A5                         // IR (Bot) Sensor,   facing left (Analog/Digital)
-#define IR_R A0                         // IR (Bot) Sensor,  facing right (Analog/Digital)
-#define IR_C A1                         // IR (Bot) Sensor, facing center (Analog/Digital)
+#define IR_L 22                         // IR (Bot) Sensor,   facing left
+#define IR_R 24                         // IR (Bot) Sensor,  facing right
+#define IR_C 26                         // IR (Bot) Sensor, facing center
 #define IR_FRAME_STEP 10                // Amount of "frames" before reading IR Sensors
 #define IR_TURN_DELAY 100               // Time (ms) to turn if IR sees bot
 
-#define IR_LINE_L 2                     // IR (Line [color]) Sensor,  Left Side
-#define IR_LINE_R 3                     // IR (Line [color]) Sensor, Right Side
-#define IR_LINE_DELAY 750               // Time (ms) of backwards, and turn/spin
+#define IR_LINE_L 32                    // IR (Line [color]) Sensor,  Left Side
+#define IR_LINE_R 34                    // IR (Line [color]) Sensor, Right Side
+#define IR_LINE_DELAY 750               // Time (ms) of backwards, then turn/spin
+
+#define CHNL_A_DIR 12                   // Channel A Motor Direction
+#define CHNL_A_PWM 3                    // Channel A Motor PWM
+#define CHNL_A_BRK 9                    // Channel A Motor Brake
+#define CHNL_A_CUR A0                   // Channel A Motor Current Sensing
+#define MOTOR_L 1                       // Make MOTOR_L evaluate to true (improves readbility of code)
+
+#define CHNL_B_DIR 13                   // Channel B Motor Direction
+#define CHNL_B_PWM 11                   // Channel B Motor PWM
+#define CHNL_B_BRK 8                    // Channel B Motor Brake
+#define CHNL_B_CUR A1                   // Channel B Motor Current Sensing
+#define MOTOR_R 0                       // Make MOTOR_R evaluate to false (improves readability of code)
 
 #define Pivot_Spin 0                    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
 #define Pivot_Speed 150                 // Speed of Pivot Spin, not dependant on Pivot_Spin
@@ -41,8 +53,8 @@ bool isirc = false;
 int ircount = 0;
 
 // Configure the motor driver.
-CytronMD MOTOR_L(PWM_DIR, 5, 4); // Needs Negative Direction
-CytronMD MOTOR_R(PWM_DIR, 6, 7);
+// CytronMD MOTOR_L(PWM_DIR, 5, 4); // Needs Negative Direction
+// CytronMD MOTOR_R(PWM_DIR, 6, 7);
 
 void setup()
 {
@@ -62,6 +74,15 @@ void setup()
   pinMode(ULTRASONIC_TRIG, OUTPUT); // HC SR04  (Trigger)
   pinMode(ULTRASONIC_ECHO, INPUT);  // HC SR04 (Response)
 
+  // Motor Pins
+  pinMode(CHNL_A_DIR, OUTPUT);
+  pinMode(CHNL_A_PWM, OUTPUT);
+  pinMode(CHNL_A_BRK, OUTPUT);
+
+  pinMode(CHNL_B_DIR, OUTPUT);
+  pinMode(CHNL_B_PWM, OUTPUT);
+  pinMode(CHNL_B_BRK, OUTPUT);
+
   // Button Pin
   pinMode(BUTTON_OUTPUT, INPUT);
 }
@@ -80,8 +101,8 @@ void loop()
   // Stop
   if (!digitalRead(BUTTON_OUTPUT))
   {
-    MOTOR_L.setSpeed(0);
-    MOTOR_R.setSpeed(0);
+    SetSpeed(MOTOR_L, 0);
+    SetSpeed(MOTOR_R, 0);
     State = -1;
     return;
   }
@@ -152,8 +173,8 @@ void Idle()
   {
     Serial.println("Continuing Forward");
     // Move Forward
-    MOTOR_L.setSpeed(-Travel_Speed);
-    MOTOR_R.setSpeed(Travel_Speed);
+    SetSpeed(MOTOR_L, Travel_Speed);
+    SetSpeed(MOTOR_R, Travel_Speed);
     if (Scan_While_Travel)
     {
       ScanForEnemies();
@@ -173,8 +194,8 @@ void Attack()
   {
     Serial.println("Enemy In Front");
     // Move Forward
-    MOTOR_L.setSpeed(-Attack_Speed);
-    MOTOR_R.setSpeed(Attack_Speed);
+    SetSpeed(MOTOR_L, Attack_Speed);
+    SetSpeed(MOTOR_R, Attack_Speed);
   }
 
   // Turn in the direction of the enemy
@@ -182,16 +203,16 @@ void Attack()
   {
     Serial.println("Enemy to right");
     // Turn Right
-    MOTOR_L.setSpeed(-Attack_Speed);
-    MOTOR_R.setSpeed(Pivot_Spin ? -Attack_Speed : 0);
+    SetSpeed(MOTOR_L, Attack_Speed);
+    SetSpeed(MOTOR_R, Pivot_Spin ? -Attack_Speed : 0);
     delay(IR_TURN_DELAY);
   }
   else if (isirl)
   {
     Serial.println("Enemy to left");
     // Turn Left
-    MOTOR_L.setSpeed(Pivot_Spin ? Attack_Speed : 0);
-    MOTOR_R.setSpeed(Attack_Speed);
+    SetSpeed(MOTOR_L, Pivot_Spin ? -Attack_Speed : 0);
+    SetSpeed(MOTOR_R, Attack_Speed);
     delay(IR_TURN_DELAY);
   }
   else
@@ -216,11 +237,11 @@ void Defend()
       {
         if (Is_Near_White_Line == 1) // White on Left => Turn Right => More Speed Left
         {
-          MOTOR_L.setSpeed(-Defend_Speed);
-          MOTOR_R.setSpeed(Pivot_Spin ? -Defend_Speed : 0);
+          SetSpeed(MOTOR_L, Defend_Speed);
+          SetSpeed(MOTOR_R, Pivot_Spin ? -Defend_Speed : 0);
         } else { // White on Right or No White => Turn Left => More Speed Right;
-          MOTOR_R.setSpeed(Defend_Speed);
-          MOTOR_L.setSpeed(Pivot_Spin ? Defend_Speed : 0);
+          SetSpeed(MOTOR_R, Defend_Speed);
+          SetSpeed(MOTOR_L, Pivot_Spin ? -Defend_Speed : 0);
         }
         LookForLine(Is_Near_White_Line);
       }
