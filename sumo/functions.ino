@@ -100,13 +100,13 @@ void SetSpeed(bool chnl_a, int speed)
     // Apply to motor channel A
     digitalWrite(CHNL_A_BRK, (speed == 0) ? HIGH : LOW);
     digitalWrite(CHNL_A_DIR, (speed < 0) ? LOW : HIGH);
-    analogWrite(CHNL_A_PWM, (speed < 0) ? -speed, speed);
+    analogWrite(CHNL_A_PWM, (speed < 0) ? -speed : speed);
   }
   else
   {
     // Apply to motor channel B
     digitalWrite(CHNL_B_BRK, (speed == 0) ? HIGH : LOW);
     digitalWrite(CHNL_B_DIR, (speed < 0) ? LOW : HIGH);
-    analogWrite(CHNL_B_PWM, (speed < 0) ? -speed, speed);
+    analogWrite(CHNL_B_PWM, (speed < 0) ? -speed : speed);
   }
 }
