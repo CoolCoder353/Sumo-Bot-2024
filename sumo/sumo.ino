@@ -88,7 +88,7 @@ void setup()
 
   // Wait 3 Seconds (once it receives power)
   delay(3000);
-  state = 0; // Start in IDLE
+  State = 0; // Start in IDLE
 }
 
 void loop()
