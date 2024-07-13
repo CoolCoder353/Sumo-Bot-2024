@@ -43,7 +43,7 @@
 #define Defend_Velocity_Threshold 10    // Threshold for the velocity of the enemy (cm/s)
 
 // NOTE: Cant be define as needs to be changed
-int State = -1;                         // -1=WAIT/DELAY, 0=IDLE, 1=ATTACK, 2=DEFEND
+int State = -1;                          // -1=WAIT/DELAY, 0=IDLE, 1=ATTACK, 2=DEFEND
 int Is_Near_White_Line = 0;             // 0=No, 1=Left, 2=Right
 
 // IR Variables (fuck you oscar)
@@ -85,6 +85,10 @@ void setup()
 
   // Button Pin
   pinMode(BUTTON_OUTPUT, INPUT);
+
+  // Wait 3 Seconds (once it receives power)
+  delay(3000);
+  state = 0; // Start in IDLE
 }
 
 void loop()
@@ -93,19 +97,19 @@ void loop()
   // BUTTON CODE
   //////////////
   // Start
-  if (digitalRead(BUTTON_OUTPUT) && State == -1)
-  {
-    delay(3000); // Wait 3 seconds
-    State = 0;
-  }
+  // if (digitalRead(BUTTON_OUTPUT) && State == -1)
+  // {
+  //   delay(3000); // Wait 3 seconds
+  //   State = 0;
+  // }
   // Stop
-  if (!digitalRead(BUTTON_OUTPUT))
-  {
-    SetSpeed(MOTOR_L, 0);
-    SetSpeed(MOTOR_R, 0);
-    State = -1;
-    return;
-  }
+  // if (!digitalRead(BUTTON_OUTPUT))
+  // {
+  //   SetSpeed(MOTOR_L, 0);
+  //   SetSpeed(MOTOR_R, 0);
+  //   State = -1;
+  //   return;
+  // }
 
   //////////////////
   // COLOR/LINE CODE

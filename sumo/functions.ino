@@ -93,6 +93,7 @@ void AvoidWhiteLine()
     }
 }
 
+// DC Motor Speed Control (using General Arduino Motor Driver)
 void SetSpeed(bool chnl_a, int speed)
 {
   if (chnl_a)
