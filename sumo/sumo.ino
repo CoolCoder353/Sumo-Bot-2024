@@ -7,8 +7,8 @@
 #define ULTRASONIC_TIMEOUT 300
 
 #define IR_L 22                         // IR (Bot) Sensor,   facing left
-#define IR_R 24                         // IR (Bot) Sensor,  facing right
-#define IR_C 26                         // IR (Bot) Sensor, facing center
+#define IR_C 24                         // IR (Bot) Sensor,  facing right
+#define IR_R 26                         // IR (Bot) Sensor, facing center
 #define IR_FRAME_STEP 10                // Amount of "frames" before reading IR Sensors
 #define IR_TURN_DELAY 100               // Time (ms) to turn if IR sees bot
 
@@ -29,15 +29,15 @@
 #define MOTOR_R 0                       // Make MOTOR_R evaluate to false (improves readability of code)
 
 #define Pivot_Spin 0                    // If we should move motors in opposing directions to spin arround axis 0=No, 1=Yes
-#define Pivot_Speed 150                 // Speed of Pivot Spin, not dependant on Pivot_Spin
+#define Pivot_Speed 100                 // Speed of Pivot Spin, not dependant on Pivot_Spin
 
 #define Travel_Speed 100                // Speed of Travel
 #define Scan_While_Travel 1             // If we should scan for enemies while moving 0=No, 1=Yes
 
-#define Attack_Speed 125                // Speed of Attack
+#define Attack_Speed 150                // Speed of Attack
 #define Attack_Distance 25              // Distance to Attack (cm)
 
-#define Defend_Speed 125                // Speed of Defend
+#define Defend_Speed 100                // Speed of Defend
 #define Defend_Distance 70              // Distance to Defend (cm)
 #define Defend_Velocity_Check_Time 300  // Time to check the velocity of the enemy (ms)
 #define Defend_Velocity_Threshold 10    // Threshold for the velocity of the enemy (cm/s)
@@ -116,11 +116,11 @@ void loop()
   //////////////////
   // Check if we are near white line or not
   LookForLine(Is_Near_White_Line);
-  if (Is_Near_White_Line > 0)
-  {
-    AvoidWhiteLine();
-    return; // Immediately skip to next update to avoid double turns
-  }
+  // if (Is_Near_White_Line > 0)
+  // {
+  //   AvoidWhiteLine();
+  //   return; // Immediately skip to next update to avoid double turns
+  // }
 
   /////////////////
   // IR SENSOR CODE
@@ -135,9 +135,9 @@ void loop()
   ircount++;
 
   // LOGGING
-  // Serial.println("COLOR SENSORS: ");
-  // Serial.println(!digitalRead(IR_LINE_L));
-  // Serial.println(!digitalRead(IR_LINE_R));
+  Serial.println("COLOR SENSORS: ");
+  Serial.println(!digitalRead(IR_LINE_L));
+  Serial.println(!digitalRead(IR_LINE_R));
   // Serial.println(Is_Near_White_Line);
   // Serial.println("IR SENSORS: ");
   // Serial.println(!digitalRead(IR_L));
@@ -145,7 +145,6 @@ void loop()
   // Serial.println(!digitalRead(IR_R));
   // Serial.println("ULTRASONIC SENSORS");
   // Serial.println(GetDistance());
-  // delay(3000);
 
   ////////////////
   // STATE MACHINE
@@ -161,8 +160,10 @@ void loop()
   }
   else if (State == 2)
   {
-    Defend();
+    // Defend();
+    Idle();
   }
+  // Attack();
 }
 
 void Idle()

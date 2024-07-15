@@ -62,7 +62,8 @@ void ScanForEnemies()
 void LookForLine(int &var) // &var is pointer to variable
 {
   // Check both IR Line Sensors for Line
-  var = (isSomethingInFront(IR_LINE_L) ? 1 : (isSomethingInFront(IR_LINE_R) ? 2 : 0));
+  var = (isSomethingInFront(IR_LINE_R) ? 2 : 0);
+  // var = (isSomethingInFront(IR_LINE_L) ? 1 : (isSomethingInFront(IR_LINE_R) ? 2 : 0));
 }
 
 void AvoidWhiteLine()
@@ -99,9 +100,9 @@ void SetSpeed(bool chnl_a, int speed)
   if (chnl_a)
   {
     // Apply to motor channel A
-    digitalWrite(CHNL_A_BRK, (speed == 0) ? HIGH : LOW);
-    digitalWrite(CHNL_A_DIR, (speed < 0) ? LOW : HIGH);
-    analogWrite(CHNL_A_PWM, (speed < 0) ? -speed : speed);
+    digitalWrite(CHNL_A_BRK, (speed == 0) ? HIGH : LOW);   // Brake
+    digitalWrite(CHNL_A_DIR, (speed < 0) ? HIGH : LOW);    // Direction
+    analogWrite(CHNL_A_PWM, (speed < 0) ? -speed : speed); // Speed
   }
   else
   {
